@@ -1,0 +1,168 @@
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Formik } from "formik";
+import SignUpSchema from "./SignupSchema.ts";
+import { useSignUp } from "../../Services/ReactQueryFiles/useSignup.ts";
+import LoadingIndicator from "../../Utils/LoadingIndicator.tsx";
+import TextFieldUtil from "./Textfield.tsx";
+import { commonTextFieldStyle } from "../../Utils/constants";
+
+function SignUp() {
+  const navigate = useNavigate();
+  const { signUpFn, isPending } = useSignUp();
+
+  if (isPending) return <LoadingIndicator />;
+
+  return (
+    <Box
+      sx={{
+        background:
+          "linear-gradient(9deg, rgba(2,0,36,0.3585083691679797) 0%, rgba(153,228,141,0.980357108663778) 40%, rgba(0,223,255,1) 92%)",
+        minWidth: "100vh",
+        minHeight: "100vh",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          minWidth: "100vh",
+        }}
+      >
+        <Box
+          sx={{
+            backgroundColor: "white",
+            width: "50%",
+            height: "30%",
+            borderRadius: "20px",
+          }}
+        >
+          <Typography
+            sx={{ color: "purple", fontSize: "25px" }}
+            textAlign="center"
+          >
+            Sign Up
+          </Typography>
+          <Formik
+            initialValues={{
+              email: "",
+              username: "",
+              password: "",
+            }}
+            onSubmit={(values, { setSubmitting }) => {
+              setTimeout(() => {
+                signUpFn(
+                  { ...values },
+                  {
+                    onSuccess() {
+                      navigate("/login");
+                    },
+                  }
+                );
+                setSubmitting(false);
+              }, 400);
+            }}
+            validationSchema={SignUpSchema}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                    margin: "10px",
+                  }}
+                >
+                  <TextFieldUtil
+                    fieldName={"Email"}
+                    label={"Enter Your Email"}
+                    type={"email"}
+                    name={"email"}
+                    values={values.email}
+                    errors={errors.email}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    touched={touched.email}
+                  />
+
+                  <TextFieldUtil
+                    fieldName={"Username"}
+                    label={"Enter Your Username"}
+                    type={"text"}
+                    name={"username"}
+                    values={values.username}
+                    errors={errors.username}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    touched={touched.username}
+                  />
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: "5px",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Typography sx={{ color: "purple" }}>Password</Typography>
+                    <TextField
+                      label="Enter Your Password"
+                      type="password"
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      sx={commonTextFieldStyle}
+                    />
+                    {errors.password && touched.password && (
+                      <Typography sx={{ fontSize: "10px", color: "red" }}>
+                        {errors.password}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "50px",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    sx={{ margin: "10px", background: "rgb(71, 193, 206)" }}
+                    onClick={() => navigate("/login")}
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{ margin: "10px" }}
+                  >
+                    Submit
+                  </Button>
+                </Box>
+              </form>
+            )}
+          </Formik>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+export default SignUp;
